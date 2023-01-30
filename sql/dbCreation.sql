@@ -1,4 +1,7 @@
---SQL Code for the database creation
+/*
+SQL Code for the database creation. 
+author: ooemperor
+*/
 /*
 -- SCHEMA: dv
 DROP SCHEMA IF EXISTS dv CASCADE;
@@ -21,114 +24,110 @@ GRANT ALL ON SCHEMA dv TO pg_database_owner;
 CREATE SCHEMA IF NOT EXISTS sec
     AUTHORIZATION postgres;
 */
+DROP TABLE IF EXISTS dv.specs;
+DROP TABLE IF EXISTS dv.nozzle;
+DROP TABLE IF EXISTS dv.extruder;
+DROP TABLE IF EXISTS dv.filament;
+DROP TABLE IF EXISTS dv.plate;
+DROP TABLE IF EXISTS dv.printer;
+DROP TABLE IF EXISTS dv.manufacturer;
+DROP TABLE IF EXISTS sec.user;
 
-DROP TABLE IF EXISTS sec.password;
-DROP TABLE IF EXISTS 3dBok.user;
-
-CREATE TABLE 3dBok.user (
-    pkey SERIAL PRIMARY KEY, 
+CREATE TABLE sec.user (
+    user_sk SERIAL PRIMARY KEY, 
     load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
     username VARCHAR(32) NOT NULL,
-    mail VARCHAR(128) NOT NULL
+    mail VARCHAR(128) NOT NULL, 
+    administrator BOOLEAN DEFAULT FALSE,
+    password VARCHAR(256) NOT NULL
 );
 
-CREATE TABLE sec.password (
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
-    user_pkey INT,
-    delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    password VARCHAR(128) NOT NULL, 
-    FOREIGN KEY (user_pkey) REFERENCES 3dBok.user(pkey)
-);
-
-CREATE TABLE manufacturer (
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+CREATE TABLE dv.manufacturer (
+    manufacturer_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    --TODO
+    name VARCHAR(128) NOT NULL, 
+    url VARCHAR(256) NOT NULL
 );
 
-CREATE TABLE printer (
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+CREATE TABLE dv.printer (
+    printer_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    type VARCHAR(64) NOT NULL, 
-    manufacturer VARCHAR(64) NOT NULL, 
+    name VARCHAR(128),
+    manufacturer_sk INT,
     description VARCHAR(512), 
-    url
+    url VARCHAR(256) NOT NULL,
+    FOREIGN KEY (manufacturer_sk) REFERENCES dv.manufacturer (manufacturer_sk)
 );
 
-CREATE TABLE plate (
-    /*
-    glass, glass plated, PEI, BuildPlate, FR4
-    */
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+
+CREATE TABLE dv.plate (
+    plate_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    --TODO
+    material VARCHAR(64) NOT NULL
 );
 
-CREATE TABLE fillament (
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+CREATE TABLE dv.filament (
+    filament_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    manufacturer,
-    color,
-    temp_min_extruder,
-    temp_max_extruder,
-    temp_min_bed,
-    temp_max_bed,
-    diameter, 
-    url
-    --TODO
+    manufacturer_sk INT,
+    color VARCHAR(64) NOT NULL,
+    temp_min_extruder INTEGER,
+    temp_max_extruder INTEGER,
+    temp_min_bed INTEGER,
+    temp_max_bed INTEGER,
+    diameter DECIMAL, 
+    url VARCHAR(256), 
+    FOREIGN KEY (manufacturer_sk) REFERENCES dv.manufacturer (manufacturer_sk)
 );
 
-CREATE TABLE extruder (
-    /*
-    direct, bowden
-    */
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+CREATE TABLE dv.extruder (
+    extruder_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    --TODO
+    type VARCHAR(128) NOT NULL
 );
 
-CREATE TABLE nozzle (
-    /*
-    brass, brass plated, copper plated, steel, rubin (?)
-    */
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+CREATE TABLE dv.nozzle (
+    nozzle_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    --TODO
+    material VARCHAR(128) NOT NULL 
 );
 
-CREATE TABLE specs (
-    pkey SERIAL PRIMARY KEY, 
-    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+CREATE TABLE dv.specs (
+    specs_sk SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    printer_pkey,
-    extruder_pkey,
-    bed_pkey,
-    fillament_pkey,
-    temp_hotend,
-    temp_bed, 
-    speed_out, 
-    speed_in,
-    cooling, 
-    z_jump,
-    extrude_speed,
-    speed_first_layer,
-    temp_hotend_first_layer,
-    temp_bed_first_layer,
-    nozzle, 
-    nozzle diameter
+    printer_sk INT,
+    extruder_sk INT,
+    plate_sk INT,
+    filament_sk INT,
+    temp_hotend INTEGER,
+    temp_bed INTEGER, 
+    speed_out INTEGER, 
+    speed_in INTEGER,
+    cooling INTEGER, 
+    z_jump DECIMAL,
+    extrude_speed INTEGER,
+    speed_first_layer INTEGER,
+    temp_hotend_first_layer INTEGER,
+    temp_bed_first_layer INTEGER,
+    nozzle_sk INT, 
+    nozzle_iameter DECIMAL,
+    FOREIGN KEY (printer_sk) REFERENCES dv.printer (printer_sk),
+    FOREIGN KEY (extruder_sk) REFERENCES dv.extruder (extruder_sk),
+    FOREIGN KEY (plate_sk) REFERENCES dv.plate (plate_sk),
+    FOREIGN KEY (filament_sk) REFERENCES dv.filament (filament_sk)
 );
