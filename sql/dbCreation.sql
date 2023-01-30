@@ -1,4 +1,4 @@
-
+--SQL Code for the database creation
 /*
 -- SCHEMA: dv
 DROP SCHEMA IF EXISTS dv CASCADE;
@@ -42,11 +42,93 @@ CREATE TABLE sec.password (
     FOREIGN KEY (user_pkey) REFERENCES 3dBok.user(pkey)
 );
 
+CREATE TABLE manufacturer (
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    --TODO
+);
+
 CREATE TABLE printer (
     pkey SERIAL PRIMARY KEY, 
     load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
     update_DTS TIMESTAMPTZ DEFAULT NULL,
     delete_DTS TIMESTAMPTZ DEFAULT NULL,
-    typ VARCHAR(64) NOT NULL, 
-    hersteller VARCHAR(64) NOT NULL
+    type VARCHAR(64) NOT NULL, 
+    manufacturer VARCHAR(64) NOT NULL, 
+    description VARCHAR(512), 
+    url
+);
+
+CREATE TABLE plate (
+    /*
+    glass, glass plated, PEI, BuildPlate, FR4
+    */
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    --TODO
+);
+
+CREATE TABLE fillament (
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    manufacturer,
+    color,
+    temp_min_extruder,
+    temp_max_extruder,
+    temp_min_bed,
+    temp_max_bed,
+    diameter, 
+    url
+    --TODO
+);
+
+CREATE TABLE extruder (
+    /*
+    direct, bowden
+    */
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    --TODO
+);
+
+CREATE TABLE nozzle (
+    /*
+    brass, brass plated, copper plated, steel, rubin (?)
+    */
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    --TODO
+);
+
+CREATE TABLE specs (
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    printer_pkey,
+    extruder_pkey,
+    bed_pkey,
+    fillament_pkey,
+    temp_hotend,
+    temp_bed, 
+    speed_out, 
+    speed_in,
+    cooling, 
+    z_jump,
+    extrude_speed,
+    speed_first_layer,
+    temp_hotend_first_layer,
+    temp_bed_first_layer,
+    nozzle, 
+    nozzle diameter
 );
