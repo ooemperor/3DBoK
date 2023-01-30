@@ -1,0 +1,52 @@
+
+/*
+-- SCHEMA: dv
+DROP SCHEMA IF EXISTS dv CASCADE;
+
+CREATE SCHEMA IF NOT EXISTS dv AUTHORIZATION pg_database_owner;
+
+COMMENT ON SCHEMA dv
+    IS 'DataVault Schema';
+
+GRANT USAGE ON SCHEMA dv TO PUBLIC;
+
+GRANT ALL ON SCHEMA dv TO pg_database_owner;
+*/
+
+/*
+-- SCHEMA: sec
+
+-- DROP SCHEMA IF EXISTS sec CASCADE;
+
+CREATE SCHEMA IF NOT EXISTS sec
+    AUTHORIZATION postgres;
+*/
+
+DROP TABLE IF EXISTS sec.password;
+DROP TABLE IF EXISTS 3dBok.user;
+
+CREATE TABLE 3dBok.user (
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS TIMESTAMPTZ DEFAULT NOW()::timestamp,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    username VARCHAR(32) NOT NULL,
+    mail VARCHAR(128) NOT NULL
+);
+
+CREATE TABLE sec.password (
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    user_pkey INT,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    password VARCHAR(128) NOT NULL, 
+    FOREIGN KEY (user_pkey) REFERENCES 3dBok.user(pkey)
+);
+
+CREATE TABLE printer (
+    pkey SERIAL PRIMARY KEY, 
+    load_DTS IMESTAMPTZ DEFAULT NOW()::timestamp,
+    update_DTS TIMESTAMPTZ DEFAULT NULL,
+    delete_DTS TIMESTAMPTZ DEFAULT NULL,
+    typ VARCHAR(64) NOT NULL, 
+    hersteller VARCHAR(64) NOT NULL
+);

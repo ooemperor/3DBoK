@@ -1,0 +1,7 @@
+#what to ignore when uploading
+*_prod.json
+*.pdf
+*.xlsx
+*.docx
+*.pptx
+*.idea
